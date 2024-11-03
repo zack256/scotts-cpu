@@ -1,5 +1,3 @@
-import random
-
 from circuit_component import CircuitComponent
 from gates import NANDGate
 from utils import rand_01
@@ -19,8 +17,10 @@ class SRLatch(CircuitComponent):
     NAND_1 = NANDGate()
     NAND_2 = NANDGate()
 
-    Q_val = rand_01()
-    over_Q_val = rand_01()
+    def __init__(self):
+        # These values are unique to each SR Latch, akin to memory. So they must be instance vars rather than class vars
+        self.Q_val = rand_01()
+        self.over_Q_val = rand_01()
 
     def inner_evaluate(self, input_voltages):
         
@@ -72,4 +72,41 @@ class SRLatch(CircuitComponent):
         return {
             "Q": self.Q_val,
             "OVER_Q": self.over_Q_val
+        }
+
+class DLatch(CircuitComponent):
+
+    required_input_ports = {
+        "IN": None,
+        "SET": None
+    }
+    required_output_ports = {
+        "Q": None,
+        "OVER_Q": None      # prob unused
+    }
+
+    NAND_1 = NANDGate()
+    NAND_2 = NANDGate()
+
+    def __init__(self):
+        self.SR_latch = SRLatch()
+
+    def inner_evaluate(self, input_voltages):
+        in_input = input_voltages["IN"]
+        set_input = input_voltages["SET"]
+        nand_1_output = self.NAND_1.evaluate({
+            "INPUT_1": in_input,
+            "INPUT_2": set_input
+        })["OUT"]
+        nand_2_output = self.NAND_2.evaluate({
+            "INPUT_1": nand_1_output,
+            "INPUT_2": set_input
+        })["OUT"]
+        sr_latch_res = self.SR_latch.evaluate({
+            "OVER_S": nand_1_output,
+            "OVER_R": nand_2_output
+        })
+        return {
+            "Q": sr_latch_res["Q"],
+            "OVER_Q": sr_latch_res["OVER_Q"]
         }
