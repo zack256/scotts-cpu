@@ -41,6 +41,14 @@ def test_SR_latch(over_S, over_R):
             except Exception as e:
                 print(e)
 
+def test_byte_memory(byte_memory_cell, s, bit_string):
+    res = byte_memory_cell.evaluate({
+        "S": s,
+    } | {
+        f"IN_{i}": int(bit_string[i]) for i in range(8)
+    })
+    return "".join([str(res[f"O_{i}"]) for i in range(8)])
+
 if __name__ == "__main__":
     test_gate(XORGate(), "XOR", 2)
     test_gate(AND3(), "AND3", 3)
