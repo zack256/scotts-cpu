@@ -49,6 +49,17 @@ def test_byte_memory(byte_memory_cell, s, bit_string):
     })
     return "".join([str(res[f"O_{i}"]) for i in range(8)])
 
+def test_byte_register(byte_memory_register, s, e, bit_string):
+    def test_helper(transistor_output):
+        return str(transistor_output.voltage) if transistor_output.connected else "X"
+    res = byte_memory_register.evaluate({
+        "S": s,
+        "E": e,
+    } | {
+        f"IN_{i}": int(bit_string[i]) for i in range(8)
+    })
+    return "".join([test_helper(res[f"O_{i}"]) for i in range(8)])
+
 if __name__ == "__main__":
     test_gate(XORGate(), "XOR", 2)
     test_gate(AND3(), "AND3", 3)

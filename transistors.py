@@ -103,3 +103,20 @@ class PTypeTransistor(Transistor):
         else:
             res = UnconnectedTransistorOutput()
         return {"OUT": res}
+
+class TriState(CircuitComponent):
+    
+    required_input_ports = {
+        "IN": None,
+        "E": None
+    }
+    required_output_ports = {
+        "OUT": TransistorOutput
+    }
+
+    def inner_evaluate(self, input_voltages):
+        
+        if input_voltages["E"]:
+            return {"OUT": ConnectedTransistorOutput(input_voltages["IN"])}
+        else:
+            return {"OUT": UnconnectedTransistorOutput()}
